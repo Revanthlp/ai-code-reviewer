@@ -6,7 +6,7 @@ from app.db.database import Base, engine
 
 app = FastAPI()
 
-# ✅ CREATE TABLES (IMPORTANT FOR RENDER)
+# ✅ CREATE TABLES
 Base.metadata.create_all(bind=engine)
 
 # ✅ CORS
