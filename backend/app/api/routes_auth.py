@@ -9,7 +9,7 @@ from pydantic import BaseModel
 router = APIRouter()
 
 # ✅ Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 # ✅ Request schema
 class UserCreate(BaseModel):
