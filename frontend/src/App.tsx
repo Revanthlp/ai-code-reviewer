@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-const API = import.meta.env.VITE_API_URL;
+
+const API = "https://ai-code-reviewer-rbas.onrender.com";
 
 export default function App() {
   const [username, setUsername] = useState("");
@@ -14,7 +15,7 @@ export default function App() {
   const [displayText, setDisplayText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Typing Effect
+  // ✨ Typing Effect
   useEffect(() => {
     let i = 0;
     setDisplayText("");
@@ -28,43 +29,44 @@ export default function App() {
     }
   }, [answer]);
 
-  // ✅ FINAL SIGNUP (AXIOS)
+  // ✅ SIGNUP
   const signup = async () => {
     try {
-      const res = await axios.post(`${API}/signup`, {
-        username,
-        password
+      const res = await fetch(`${API}/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
       });
 
-      console.log(res.data);
-      alert("User created ✅");
+      const data = await res.json();
+      console.log(data);
 
-    } catch (error: any) {
-      console.error("FULL ERROR:", error);
-
-      if (error.response) {
-        alert("Signup failed: " + JSON.stringify(error.response.data));
-      } else if (error.request) {
-        alert("Server not responding ❌");
+      if (res.ok) {
+        alert("User created ✅");
       } else {
-        alert("Error ❌");
+        alert("Signup failed ❌");
       }
+    } catch (error) {
+      console.error(error);
+      alert("Server not responding ❌");
     }
   };
 
-  // LOGIN
+  // ✅ LOGIN
   const login = async () => {
     try {
       const res = await axios.post(`${API}/login`, { username, password });
       setToken(res.data.token);
-      alert("Logged in ✅");
-    } catch (error: any) {
-      console.error(error);
+      alert("Login success ✅");
+    } catch (err) {
+      console.error(err);
       alert("Login failed ❌");
     }
   };
 
-  // ANALYZE
+  // ✅ ANALYZE
   const analyze = async () => {
     try {
       setLoading(true);
@@ -75,14 +77,14 @@ export default function App() {
       );
       alert("Repo analyzed ✅");
       setLoading(false);
-    } catch (error: any) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setLoading(false);
       alert("Analyze failed ❌");
     }
   };
 
-  // ASK
+  // ✅ ASK AI
   const ask = async () => {
     try {
       setLoading(true);
@@ -93,8 +95,8 @@ export default function App() {
       );
       setAnswer(res.data.answer);
       setLoading(false);
-    } catch (error: any) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setLoading(false);
       alert("Ask failed ❌");
     }
@@ -115,15 +117,8 @@ export default function App() {
         {/* AUTH */}
         <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
           <h2>🔐 Auth</h2>
-          <input
-            placeholder="Username"
-            onChange={e => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={e => setPassword(e.target.value)}
-          />
+          <input placeholder="Username" onChange={e=>setUsername(e.target.value)} />
+          <input type="password" placeholder="Password" onChange={e=>setPassword(e.target.value)} />
           <button onClick={signup}>Signup</button>
           <button onClick={login}>Login</button>
         </motion.div>
@@ -131,30 +126,20 @@ export default function App() {
         {/* ANALYZE */}
         <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
           <h2>📂 Analyze</h2>
-          <input
-            placeholder="GitHub Repo URL"
-            onChange={e => setRepo(e.target.value)}
-          />
+          <input placeholder="GitHub Repo URL" onChange={e=>setRepo(e.target.value)} />
           <button onClick={analyze}>Analyze Repo</button>
         </motion.div>
 
         {/* ASK */}
         <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
           <h2>🤖 Ask AI</h2>
-          <input
-            placeholder="Ask something..."
-            onChange={e => setQuestion(e.target.value)}
-          />
+          <input placeholder="Ask something..." onChange={e=>setQuestion(e.target.value)} />
           <button onClick={ask}>Ask</button>
 
           {loading && <div style={styles.loader}></div>}
 
           {displayText && (
-            <motion.div
-              style={styles.answer}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
+            <motion.div style={styles.answer} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               {displayText}
             </motion.div>
           )}
