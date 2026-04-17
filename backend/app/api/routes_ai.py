@@ -1,73 +1,59 @@
-from fastapi import APIRouter, HTTPException, Header
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException
 import requests
 
 router = APIRouter()
 
-class RepoRequest(BaseModel):
-    repo_url: str
-
-class QuestionRequest(BaseModel):
-    q: str
-
-
-# Temporary memory (demo)
-repo_data = {}
-
-
+# 🚀 ANALYZE REPO
 @router.post("/analyze")
-def analyze_repo(data: RepoRequest, authorization: str = Header(None)):
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Missing token")
+def analyze(data: dict):
+    repo_url = data.get("repo_url")
+
+    if not repo_url:
+        raise HTTPException(status_code=400, detail="Repo URL required")
 
     try:
-        # Extract repo API URL
-        if "github.com" not in data.repo_url:
+        # ✅ Convert GitHub URL → API URL
+        # Example:
+        # https://github.com/user/repo → https://api.github.com/repos/user/repo
+        parts = repo_url.replace("https://github.com/", "").split("/")
+
+        if len(parts) < 2:
             raise HTTPException(status_code=400, detail="Invalid GitHub URL")
 
-        parts = data.repo_url.replace("https://github.com/", "").split("/")
-        owner, repo = parts[0], parts[1]
+        user = parts[0]
+        repo = parts[1]
 
-        api_url = f"https://api.github.com/repos/{owner}/{repo}"
+        api_url = f"https://api.github.com/repos/{user}/{repo}"
 
-        res = requests.get(api_url)
+        response = requests.get(api_url)
 
-        if res.status_code != 200:
-            raise HTTPException(status_code=400, detail="Repo not found")
+        # ❌ Repo not found
+        if response.status_code != 200:
+            raise HTTPException(status_code=404, detail="Repo not found")
 
-        repo_info = res.json()
+        repo_data = response.json()
 
-        # Save minimal data
-        repo_data["info"] = {
-            "name": repo_info["name"],
-            "description": repo_info["description"],
-            "stars": repo_info["stargazers_count"]
+        return {
+            "message": "Repo analyzed successfully",
+            "name": repo_data.get("name"),
+            "stars": repo_data.get("stargazers_count"),
+            "description": repo_data.get("description")
         }
 
-        return {"message": "Repo analyzed successfully"}
-
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("Analyze Error:", e)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
+# 🤖 ASK AI (temporary)
 @router.post("/ask")
-def ask_ai(q: QuestionRequest, authorization: str = Header(None)):
-    if not authorization:
-        raise HTTPException(status_code=401, detail="Missing token")
+def ask(data: dict):
+    question = data.get("q")
 
-    if "info" not in repo_data:
-        raise HTTPException(status_code=400, detail="Analyze repo first")
+    if not question:
+        raise HTTPException(status_code=400, detail="Question required")
 
-    info = repo_data["info"]
-
-    # Simple AI response (demo)
-    answer = f"""
-Repository: {info['name']}
-Description: {info['description']}
-Stars: {info['stars']}
-
-Answer to your question: {q.q}
-(This is a demo response)
-"""
-
-    return {"answer": answer}
+    # Simple response for now
+    return {
+        "answer": f"You asked: {question}. AI feature coming soon 🚀"
+    }
