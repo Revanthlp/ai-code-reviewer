@@ -41,15 +41,16 @@ export default function App() {
       });
 
       const data = await res.json();
-      console.log(data);
+      console.log("Signup response:", data);
 
       if (res.ok) {
         alert("User created ✅");
       } else {
-        alert("Signup failed ❌");
+        alert(data.detail || "Signup failed ❌");
       }
+
     } catch (error) {
-      console.error(error);
+      console.error("Signup error:", error);
       alert("Server not responding ❌");
     }
   };
@@ -60,9 +61,9 @@ export default function App() {
       const res = await axios.post(`${API}/login`, { username, password });
       setToken(res.data.token);
       alert("Login success ✅");
-    } catch (err) {
-      console.error(err);
-      alert("Login failed ❌");
+    } catch (err: any) {
+      console.error("Login error:", err);
+      alert(err.response?.data?.detail || "Login failed ❌");
     }
   };
 
@@ -77,10 +78,10 @@ export default function App() {
       );
       alert("Repo analyzed ✅");
       setLoading(false);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Analyze error:", err);
       setLoading(false);
-      alert("Analyze failed ❌");
+      alert(err.response?.data?.detail || "Analyze failed ❌");
     }
   };
 
@@ -95,10 +96,10 @@ export default function App() {
       );
       setAnswer(res.data.answer);
       setLoading(false);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error("Ask error:", err);
       setLoading(false);
-      alert("Ask failed ❌");
+      alert(err.response?.data?.detail || "Ask failed ❌");
     }
   };
 
@@ -117,8 +118,8 @@ export default function App() {
         {/* AUTH */}
         <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
           <h2>🔐 Auth</h2>
-          <input placeholder="Username" onChange={e=>setUsername(e.target.value)} />
-          <input type="password" placeholder="Password" onChange={e=>setPassword(e.target.value)} />
+          <input placeholder="Username" onChange={e => setUsername(e.target.value)} />
+          <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
           <button onClick={signup}>Signup</button>
           <button onClick={login}>Login</button>
         </motion.div>
@@ -126,14 +127,14 @@ export default function App() {
         {/* ANALYZE */}
         <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
           <h2>📂 Analyze</h2>
-          <input placeholder="GitHub Repo URL" onChange={e=>setRepo(e.target.value)} />
+          <input placeholder="GitHub Repo URL" onChange={e => setRepo(e.target.value)} />
           <button onClick={analyze}>Analyze Repo</button>
         </motion.div>
 
         {/* ASK */}
         <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
           <h2>🤖 Ask AI</h2>
-          <input placeholder="Ask something..." onChange={e=>setQuestion(e.target.value)} />
+          <input placeholder="Ask something..." onChange={e => setQuestion(e.target.value)} />
           <button onClick={ask}>Ask</button>
 
           {loading && <div style={styles.loader}></div>}
