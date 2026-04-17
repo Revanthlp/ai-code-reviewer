@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 import requests
+import os
 
 router = APIRouter()
 
@@ -13,6 +14,7 @@ def analyze(data: dict):
         if not repo_url:
             raise HTTPException(status_code=400, detail="Repo URL required")
 
+        # ✅ CLEAN URL
         repo_url = repo_url.strip().replace(".git", "")
 
         if "github.com" not in repo_url:
@@ -31,15 +33,24 @@ def analyze(data: dict):
         print("USER:", user)
         print("REPO:", repo)
 
-        # ✅ GITHUB API (WITH HEADERS — IMPORTANT FIX)
+        # ✅ GITHUB API URL
         api_url = f"https://api.github.com/repos/{user}/{repo}"
         print("API URL:", api_url)
 
+        # ✅ TOKEN PART (THIS WAS MISSING BEFORE)
+        token = os.getenv("GITHUB_TOKEN")
+
         headers = {
             "Accept": "application/vnd.github+json",
-            "User-Agent": "Mozilla/5.0"   # 🔥 REQUIRED FIX
+            "User-Agent": "MyApp"
         }
 
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
+        print("TOKEN:", token)
+
+        # ✅ REQUEST WITH HEADERS
         response = requests.get(api_url, headers=headers)
 
         print("STATUS:", response.status_code)
