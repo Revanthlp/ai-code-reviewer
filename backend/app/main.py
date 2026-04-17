@@ -3,11 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import routes_auth, routes_ai
 from app.db.database import Base, engine
-import app.db.models  # ✅ IMPORTANT (FOR TABLE CREATION)
+import app.db.models
 
 app = FastAPI()
 
-# ✅ FORCE TABLE CREATION
+# ✅ CREATE TABLES
 Base.metadata.create_all(bind=engine)
 
 # ✅ CORS
