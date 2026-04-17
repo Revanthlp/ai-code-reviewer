@@ -6,10 +6,12 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
+# ✅ Request schema
 class UserCreate(BaseModel):
     username: str
     password: str
 
+# ✅ DB dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -17,17 +19,21 @@ def get_db():
     finally:
         db.close()
 
-# ✅ SIGNUP
+# 🚀 SIGNUP
 @router.post("/signup")
 def signup(user: UserCreate, db: Session = Depends(get_db)):
-    try:
-        existing_user = db.query(models.User).filter(models.User.username == user.username).first()
-        if existing_user:
-            raise HTTPException(status_code=400, detail="User already exists")
 
+    # ✅ Check if user already exists
+    existing_user = db.query(models.User).filter(models.User.username == user.username).first()
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User already exists")
+
+    try:
+        # ✅ Create new user
         new_user = models.User(
             username=user.username,
-            password=user.password  # ⚠️ plain text for now
+            password=user.password  # (plain text for now)
         )
 
         db.add(new_user)
@@ -38,20 +44,25 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
     except Exception as e:
         print("Signup Error:", e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
 
 
-# ✅ LOGIN
+# 🚀 LOGIN
 @router.post("/login")
 def login(user: UserCreate, db: Session = Depends(get_db)):
+
     try:
+        # ✅ Find user
         db_user = db.query(models.User).filter(models.User.username == user.username).first()
 
-        if not db_user or db_user.password != user.password:
-            raise HTTPException(status_code=400, detail="Invalid credentials")
+        if not db_user:
+            raise HTTPException(status_code=400, detail="User not found")
+
+        if db_user.password != user.password:
+            raise HTTPException(status_code=400, detail="Invalid password")
 
         return {"token": "fake-jwt-token"}
 
     except Exception as e:
         print("Login Error:", e)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail="Internal Server Error")
