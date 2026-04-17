@@ -32,9 +32,7 @@ export default function App() {
     try {
       const res = await fetch(`${API}/signup`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
       });
 
@@ -46,7 +44,7 @@ export default function App() {
         alert(data.detail || "Signup failed ❌");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Signup error:", error);
       alert("Server not responding ❌");
     }
   };
@@ -56,9 +54,7 @@ export default function App() {
     try {
       const res = await fetch(`${API}/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password })
       });
 
@@ -70,27 +66,29 @@ export default function App() {
         alert(data.detail || "Login failed ❌");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Login error:", error);
       alert("Server not responding ❌");
     }
   };
 
-  // 📂 ANALYZE
+  // 📂 ANALYZE (FINAL FIX)
   const analyze = async () => {
     try {
       setLoading(true);
 
+      console.log("Sending repo:", repo); // 🔥 DEBUG
+
       const res = await fetch(`${API}/analyze`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           repo_url: repo
         })
       });
 
       const data = await res.json();
+
+      console.log("Analyze response:", data); // 🔥 DEBUG
 
       if (res.ok) {
         alert(`✅ ${data.name} ⭐ ${data.stars}\n${data.description}`);
@@ -101,7 +99,7 @@ export default function App() {
       setLoading(false);
 
     } catch (error) {
-      console.error(error);
+      console.error("Analyze error:", error);
       setLoading(false);
       alert("Server not responding ❌");
     }
@@ -114,9 +112,7 @@ export default function App() {
 
       const res = await fetch(`${API}/ask`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ q: question })
       });
 
@@ -131,7 +127,7 @@ export default function App() {
       setLoading(false);
 
     } catch (error) {
-      console.error(error);
+      console.error("Ask error:", error);
       setLoading(false);
       alert("Server not responding ❌");
     }
@@ -139,40 +135,50 @@ export default function App() {
 
   return (
     <div style={styles.bg}>
-      <motion.h1
-        initial={{ opacity: 0, y: -40 }}
-        animate={{ opacity: 1, y: 0 }}
-        style={styles.title}
-      >
+      <motion.h1 style={styles.title}>
         🚀 AI Code Reviewer
       </motion.h1>
 
       <div style={styles.container}>
 
         {/* AUTH */}
-        <motion.div style={styles.card}>
+        <div style={styles.card}>
           <h2>🔐 Auth</h2>
-          <input placeholder="Username" onChange={e => setUsername(e.target.value)} />
-          <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+          <input
+            placeholder="Username"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+          />
           <button onClick={signup}>Signup</button>
           <button onClick={login}>Login</button>
-        </motion.div>
+        </div>
 
         {/* ANALYZE */}
-        <motion.div style={styles.card}>
+        <div style={styles.card}>
           <h2>📂 Analyze</h2>
           <input
             placeholder="https://github.com/user/repo"
-            onChange={e => setRepo(e.target.value)}
+            value={repo}
+            onChange={(e) => {
+              console.log("Input value:", e.target.value); // 🔥 DEBUG
+              setRepo(e.target.value);
+            }}
           />
           <button onClick={analyze}>Analyze Repo</button>
-        </motion.div>
+        </div>
 
         {/* ASK */}
-        <motion.div style={styles.card}>
+        <div style={styles.card}>
           <h2>🤖 Ask AI</h2>
           <input
             placeholder="Ask something..."
+            value={question}
             onChange={e => setQuestion(e.target.value)}
           />
           <button onClick={ask}>Ask</button>
@@ -184,7 +190,7 @@ export default function App() {
               {displayText}
             </div>
           )}
-        </motion.div>
+        </div>
 
       </div>
     </div>
