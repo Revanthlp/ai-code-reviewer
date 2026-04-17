@@ -37,6 +37,7 @@ export default function App() {
       });
 
       const data = await res.json();
+      console.log("Signup response:", data);
 
       if (res.ok) {
         alert("User created ✅");
@@ -59,6 +60,7 @@ export default function App() {
       });
 
       const data = await res.json();
+      console.log("Login response:", data);
 
       if (res.ok) {
         alert("Login success ✅");
@@ -71,7 +73,7 @@ export default function App() {
     }
   };
 
-  // 📂 ANALYZE (FINAL FIX)
+  // 📂 ANALYZE
   const analyze = async () => {
     try {
       setLoading(true);
@@ -81,13 +83,10 @@ export default function App() {
       const res = await fetch(`${API}/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          repo_url: repo
-        })
+        body: JSON.stringify({ repo_url: repo })
       });
 
       const data = await res.json();
-
       console.log("Analyze response:", data); // 🔥 DEBUG
 
       if (res.ok) {
@@ -97,7 +96,6 @@ export default function App() {
       }
 
       setLoading(false);
-
     } catch (error) {
       console.error("Analyze error:", error);
       setLoading(false);
@@ -117,6 +115,7 @@ export default function App() {
       });
 
       const data = await res.json();
+      console.log("Ask response:", data);
 
       if (res.ok) {
         setAnswer(data.answer);
@@ -125,7 +124,6 @@ export default function App() {
       }
 
       setLoading(false);
-
     } catch (error) {
       console.error("Ask error:", error);
       setLoading(false);
@@ -147,13 +145,19 @@ export default function App() {
           <input
             placeholder="Username"
             value={username}
-            onChange={e => setUsername(e.target.value)}
+            onChange={(e) => {
+              console.log("Username:", e.target.value);
+              setUsername(e.target.value);
+            }}
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => {
+              console.log("Password:", e.target.value);
+              setPassword(e.target.value);
+            }}
           />
           <button onClick={signup}>Signup</button>
           <button onClick={login}>Login</button>
@@ -179,7 +183,10 @@ export default function App() {
           <input
             placeholder="Ask something..."
             value={question}
-            onChange={e => setQuestion(e.target.value)}
+            onChange={(e) => {
+              console.log("Question:", e.target.value);
+              setQuestion(e.target.value);
+            }}
           />
           <button onClick={ask}>Ask</button>
 
