@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { motion } from "framer-motion";
 
-
+// ✅ BACKEND URL
 const API = "https://ai-code-reviewer-rbas.onrender.com";
 
 export default function App() {
@@ -15,7 +14,7 @@ export default function App() {
   const [displayText, setDisplayText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✨ Typing Effect
+  // ✨ Typing effect
   useEffect(() => {
     let i = 0;
     setDisplayText("");
@@ -29,7 +28,7 @@ export default function App() {
     }
   }, [answer]);
 
-  // ✅ SIGNUP
+  // 🔐 SIGNUP
   const signup = async () => {
     try {
       const res = await fetch(`${API}/signup`, {
@@ -41,65 +40,102 @@ export default function App() {
       });
 
       const data = await res.json();
-      console.log("Signup response:", data);
 
       if (res.ok) {
         alert("User created ✅");
       } else {
         alert(data.detail || "Signup failed ❌");
       }
-
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error(error);
       alert("Server not responding ❌");
     }
   };
 
-  // ✅ LOGIN
+  // 🔓 LOGIN
   const login = async () => {
     try {
-      const res = await axios.post(`${API}/login`, { username, password });
-      setToken(res.data.token);
-      alert("Login success ✅");
-    } catch (err: any) {
-      console.error("Login error:", err);
-      alert(err.response?.data?.detail || "Login failed ❌");
+      const res = await fetch(`${API}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setToken(data.token);
+        alert("Login success ✅");
+      } else {
+        alert(data.detail || "Login failed ❌");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server not responding ❌");
     }
   };
 
-  // ✅ ANALYZE
+  // 📂 ANALYZE (FIXED)
   const analyze = async () => {
     try {
       setLoading(true);
-      await axios.post(
-        `${API}/analyze`,
-        { repo_url: repo },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert("Repo analyzed ✅");
+
+      const res = await fetch(`${API}/analyze`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          repo_url: repo   // ✅ FIXED KEY
+        })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(`✅ ${data.name} ⭐ ${data.stars}\n${data.description}`);
+      } else {
+        alert(data.detail || "Analyze failed ❌");
+      }
+
       setLoading(false);
-    } catch (err: any) {
-      console.error("Analyze error:", err);
+
+    } catch (error) {
+      console.error(error);
       setLoading(false);
-      alert(err.response?.data?.detail || "Analyze failed ❌");
+      alert("Server not responding ❌");
     }
   };
 
-  // ✅ ASK AI
+  // 🤖 ASK
   const ask = async () => {
     try {
       setLoading(true);
-      const res = await axios.post(
-        `${API}/ask`,
-        { q: question },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setAnswer(res.data.answer);
+
+      const res = await fetch(`${API}/ask`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ q: question })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setAnswer(data.answer);
+      } else {
+        alert(data.detail || "Ask failed ❌");
+      }
+
       setLoading(false);
-    } catch (err: any) {
-      console.error("Ask error:", err);
+
+    } catch (error) {
+      console.error(error);
       setLoading(false);
-      alert(err.response?.data?.detail || "Ask failed ❌");
+      alert("Server not responding ❌");
     }
   };
 
@@ -116,7 +152,7 @@ export default function App() {
       <div style={styles.container}>
 
         {/* AUTH */}
-        <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
+        <motion.div style={styles.card}>
           <h2>🔐 Auth</h2>
           <input placeholder="Username" onChange={e => setUsername(e.target.value)} />
           <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
@@ -125,24 +161,30 @@ export default function App() {
         </motion.div>
 
         {/* ANALYZE */}
-        <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
+        <motion.div style={styles.card}>
           <h2>📂 Analyze</h2>
-          <input placeholder="GitHub Repo URL" onChange={e => setRepo(e.target.value)} />
+          <input
+            placeholder="https://github.com/user/repo"
+            onChange={e => setRepo(e.target.value)}
+          />
           <button onClick={analyze}>Analyze Repo</button>
         </motion.div>
 
         {/* ASK */}
-        <motion.div style={styles.card} whileHover={{ scale: 1.08 }}>
+        <motion.div style={styles.card}>
           <h2>🤖 Ask AI</h2>
-          <input placeholder="Ask something..." onChange={e => setQuestion(e.target.value)} />
+          <input
+            placeholder="Ask something..."
+            onChange={e => setQuestion(e.target.value)}
+          />
           <button onClick={ask}>Ask</button>
 
-          {loading && <div style={styles.loader}></div>}
+          {loading && <p>Loading...</p>}
 
           {displayText && (
-            <motion.div style={styles.answer} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <div style={styles.answer}>
               {displayText}
-            </motion.div>
+            </div>
           )}
         </motion.div>
 
@@ -154,7 +196,7 @@ export default function App() {
 const styles: any = {
   bg: {
     minHeight: "100vh",
-    background: "radial-gradient(circle at top, #0f2027, #203a43, #2c5364)",
+    background: "#0f2027",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -162,41 +204,28 @@ const styles: any = {
     color: "white"
   },
   title: {
-    fontSize: "42px",
-    marginBottom: "40px",
-    textShadow: "0 0 20px #00f2ff"
+    fontSize: "40px",
+    marginBottom: "30px"
   },
   container: {
     display: "flex",
-    gap: "30px",
+    gap: "20px",
     flexWrap: "wrap",
     justifyContent: "center"
   },
   card: {
-    background: "rgba(255,255,255,0.08)",
-    backdropFilter: "blur(20px)",
-    borderRadius: "20px",
-    padding: "25px",
-    width: "300px",
+    background: "#203a43",
+    padding: "20px",
+    borderRadius: "10px",
+    width: "280px",
     display: "flex",
     flexDirection: "column",
-    gap: "12px",
-    boxShadow: "0 0 20px rgba(0,255,255,0.3)"
+    gap: "10px"
   },
   answer: {
     marginTop: "10px",
-    background: "rgba(0,0,0,0.5)",
-    padding: "12px",
-    borderRadius: "10px",
-    border: "1px solid #00f2ff"
-  },
-  loader: {
-    width: "40px",
-    height: "40px",
-    border: "4px solid #00f2ff",
-    borderTop: "4px solid transparent",
-    borderRadius: "50%",
-    animation: "spin 1s linear infinite",
-    margin: "10px auto"
+    background: "#000",
+    padding: "10px",
+    borderRadius: "5px"
   }
 };
