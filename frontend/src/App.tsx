@@ -7,7 +7,6 @@ const API = "https://ai-code-reviewer-rbas.onrender.com";
 export default function App() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState("");
   const [repo, setRepo] = useState("");
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
@@ -66,7 +65,6 @@ export default function App() {
       const data = await res.json();
 
       if (res.ok) {
-        setToken(data.token);
         alert("Login success ✅");
       } else {
         alert(data.detail || "Login failed ❌");
@@ -77,7 +75,7 @@ export default function App() {
     }
   };
 
-  // 📂 ANALYZE (FIXED)
+  // 📂 ANALYZE
   const analyze = async () => {
     try {
       setLoading(true);
@@ -88,7 +86,7 @@ export default function App() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          repo_url: repo   // ✅ FIXED KEY
+          repo_url: repo
         })
       });
 
