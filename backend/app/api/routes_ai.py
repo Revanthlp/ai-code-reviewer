@@ -8,17 +8,23 @@ def analyze(data: dict):
     try:
         repo_url = data.get("repo_url")
 
+        print("RAW INPUT:", repo_url)
+
         if not repo_url:
             raise HTTPException(status_code=400, detail="Repo URL required")
 
-        # ✅ CLEAN URL
+        # ✅ CLEAN INPUT
         repo_url = repo_url.strip()
 
-        if "github.com" not in repo_url:
+        # ✅ REMOVE .git if exists
+        repo_url = repo_url.replace(".git", "")
+
+        # ✅ ENSURE CORRECT FORMAT
+        if not repo_url.startswith("https://github.com/"):
             raise HTTPException(status_code=400, detail="Invalid GitHub URL")
 
-        # ✅ EXTRACT USER + REPO SAFELY
-        parts = repo_url.replace("https://github.com/", "").strip("/").split("/")
+        # ✅ SPLIT USER / REPO
+        parts = repo_url.replace("https://github.com/", "").split("/")
 
         if len(parts) < 2:
             raise HTTPException(status_code=400, detail="Invalid GitHub URL")
@@ -26,19 +32,20 @@ def analyze(data: dict):
         user = parts[0].strip()
         repo = parts[1].strip()
 
-        print("User:", user)
-        print("Repo:", repo)
+        print("USER:", user)
+        print("REPO:", repo)
 
-        # ✅ CORRECT API URL
+        # ✅ GITHUB API CALL
         api_url = f"https://api.github.com/repos/{user}/{repo}"
+        print("API URL:", api_url)
 
         response = requests.get(api_url)
 
-        print("GitHub Status:", response.status_code)
-        print("GitHub Response:", response.text)
+        print("STATUS:", response.status_code)
+        print("RESPONSE:", response.text)
 
         if response.status_code != 200:
-            raise HTTPException(status_code=404, detail="Repo not found")
+            raise HTTPException(status_code=404, detail=f"Repo not found: {user}/{repo}")
 
         repo_data = response.json()
 
@@ -53,5 +60,5 @@ def analyze(data: dict):
         raise e
 
     except Exception as e:
-        print("Analyze Error:", str(e))
+        print("ERROR:", str(e))
         raise HTTPException(status_code=500, detail=str(e))
