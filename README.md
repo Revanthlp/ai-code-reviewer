@@ -1,90 +1,56 @@
-# 🚀 AI Code Reviewer
+# 🔥 AI Code Reviewer
 
-A full-stack AI-powered web application that analyzes GitHub repositories and allows users to ask questions about the code.
-
----
-
-## 🔥 Features
-
-* 🔐 User Authentication (Signup & Login)
-* 📂 Analyze any GitHub repository
-* 🤖 Ask questions about the repo (AI-style interaction)
-* ⚡ Fast backend using FastAPI
-* 🎨 Modern UI with animations (React + Framer Motion)
+An AI-powered web application that analyzes GitHub repositories and provides insights along with interactive Q&A.
 
 ---
 
-## 🖥️ Screenshots
+## 🚀 Live Demo
 
-### 🔐 Authentication UI
-
-![Auth](screenshots/ui.png)
-
-### 📂 Analyze Repository
-
-![Analyze](screenshots/analyze.png)
-
-### 🤖 AI Response
-
-![AI](screenshots/ai-response.png)
-
-### ⚙️ Backend API Docs
-
-![Backend](screenshots/backend-docs.png)
+👉 https://ai-code-reviewer-ne5w.vercel.app/
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
-### Frontend
-
-* React (Vite)
-* Axios
-* Framer Motion
-
-### Backend
-
-* FastAPI
-* SQLAlchemy
-* SQLite
-* Passlib (Authentication)
-
-### APIs
-
-* GitHub REST API
+- Frontend: React (Vite)
+- Backend: FastAPI
+- Deployment: Render (Backend), Vercel (Frontend)
+- API: GitHub REST API
 
 ---
 
-## ⚙️ Installation & Setup
+## ✨ Features
 
-### 1️⃣ Clone Repository
+- 🔐 User Authentication (Signup/Login)
+- 📂 Analyze any public GitHub repository
+- ⭐ Fetch repository details (stars, description)
+- 🤖 Ask questions about the repository
+- 🌐 Fully deployed full-stack application
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the repository
 
 ```bash
-git clone https://github.com/Revanthlp/ai-code-reviewer.git
+git clone https://github.com/your-username/ai-code-reviewer.git
 cd ai-code-reviewer
 ```
 
 ---
 
-### 2️⃣ Backend Setup
+### 2. Backend Setup
 
 ```bash
 cd backend
-python -m venv venv
-venv\Scripts\activate   # Windows
 pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-👉 Backend runs on:
-
-```
-http://127.0.0.1:8000
+uvicorn main:app --reload
 ```
 
 ---
 
-### 3️⃣ Frontend Setup
+### 3. Frontend Setup
 
 ```bash
 cd frontend
@@ -92,40 +58,49 @@ npm install
 npm run dev
 ```
 
-👉 Frontend runs on:
+---
 
+## 🔑 Environment Variables
+
+Create a `.env` file in backend:
+
+```env
+GITHUB_TOKEN=your_github_token_here
 ```
-http://localhost:5173
-```
 
 ---
 
-## 🚀 How It Works
+## 🚀 Deployment
 
-1. User signs up / logs in
-2. Enters a GitHub repository URL
-3. Backend fetches repo data via GitHub API
-4. User asks questions
-5. AI responds based on repo info
+- Backend deployed on Render
+- Frontend deployed on Vercel
 
 ---
 
-## 🌟 Future Improvements
+## 💡 Learnings
 
-* 🔗 Real AI integration (OpenAI)
-* 💾 Save chat history in database
-* 📊 Advanced code analysis
-* 🌐 Full deployment (Frontend + Backend)
-
----
-
-## 👨‍💻 Author
-
-* GitHub: https://github.com/Revanthlp
-* Email: [revanthlp2005@gmail.com](mailto:revanthlp2005@gmail.com)
+- Worked with real-world API integration (GitHub API)
+- Solved deployment issues and API rate limits
+- Built and deployed full-stack application
+- Improved debugging and problem-solving skills
 
 ---
 
-## ⭐ If you like this project
+## 📌 Future Improvements
 
-Give it a ⭐ on GitHub!
+- Integrate real AI (OpenAI API)
+- Improve UI/UX design
+- Add code-level analysis
+- Add history of analyzed repositories
+
+---
+
+## 🤝 Contributing
+
+Feel free to fork and improve this project!
+
+---
+
+## 📬 Contact
+
+If you liked this project, feel free to connect with me on LinkedIn!
