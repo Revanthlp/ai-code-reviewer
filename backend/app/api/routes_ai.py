@@ -13,18 +13,14 @@ def analyze(data: dict):
         if not repo_url:
             raise HTTPException(status_code=400, detail="Repo URL required")
 
-        # ✅ CLEAN INPUT
-        repo_url = repo_url.strip()
+        repo_url = repo_url.strip().replace(".git", "")
 
-        # ✅ REMOVE .git if exists
-        repo_url = repo_url.replace(".git", "")
-
-        # ✅ ENSURE CORRECT FORMAT
-        if not repo_url.startswith("https://github.com/"):
+        if "github.com" not in repo_url:
             raise HTTPException(status_code=400, detail="Invalid GitHub URL")
 
-        # ✅ SPLIT USER / REPO
-        parts = repo_url.replace("https://github.com/", "").split("/")
+        # ✅ EXTRACT USER + REPO
+        repo_path = repo_url.split("github.com/")[-1]
+        parts = repo_path.split("/")
 
         if len(parts) < 2:
             raise HTTPException(status_code=400, detail="Invalid GitHub URL")
@@ -35,17 +31,25 @@ def analyze(data: dict):
         print("USER:", user)
         print("REPO:", repo)
 
-        # ✅ GITHUB API CALL
+        # ✅ GITHUB API (WITH HEADERS — IMPORTANT FIX)
         api_url = f"https://api.github.com/repos/{user}/{repo}"
         print("API URL:", api_url)
 
-        response = requests.get(api_url)
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Mozilla/5.0"   # 🔥 REQUIRED FIX
+        }
+
+        response = requests.get(api_url, headers=headers)
 
         print("STATUS:", response.status_code)
         print("RESPONSE:", response.text)
 
         if response.status_code != 200:
-            raise HTTPException(status_code=404, detail=f"Repo not found: {user}/{repo}")
+            raise HTTPException(
+                status_code=404,
+                detail=f"Repo not found OR GitHub blocked request ({response.status_code})"
+            )
 
         repo_data = response.json()
 
