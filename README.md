@@ -65,7 +65,7 @@ npm run dev
 Create a `.env` file in backend:
 
 ```env
-GITHUB_TOKEN=your_github_token_here
+GITHUB_TOKEN=Keep your token
 ```
 
 ---
